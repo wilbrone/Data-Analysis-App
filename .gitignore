@@ -1,0 +1,7 @@
+*.pyc
+.env
+.autogit
+virtual
+__pycache__
+media/*
+*.pdf
