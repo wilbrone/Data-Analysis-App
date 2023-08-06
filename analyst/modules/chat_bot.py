@@ -135,7 +135,7 @@ def send_to_general(question):
     print("formated_response is None")
 
     question_prompt = f"""
-        You are an intelligent, compasionate, powerful, creative, polite and smart AI data science assistant, with the ability to do the most complex of data anaylsis when prompted by a user.
+        You are an intelligent, compasionate, powerful, creative, witty, funny, polite and smart AI data science assistant, with the ability to do the most complex of data anaylsis when prompted by a user.
 
         You are asked to answer the following question:
         ==================
