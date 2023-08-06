@@ -32,8 +32,8 @@ NOTE: Incase you install additional package, always remember to update the requi
 * You can send your message to the api **send_question**. Your question should have the following format:-
     ```
     {
-        "userId":"ObjectID of a real user in the DB",
-        "sessionId":"ObjectId of a session or just leave it empty", 
+        "userId": 2,
+        "sessionId":1, 
         "questionType":"text", 
         "question":"Can you visualize the growth of a $25,000 investment with an annual return of 7.8% over 20 years?"
     }
