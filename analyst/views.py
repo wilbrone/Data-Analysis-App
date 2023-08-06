@@ -7,10 +7,10 @@ from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
 
-from analyst.modules.chat_bot import process_user_query
+from analyst.modules.chat_bot import chat_bot_qeustion_predictions, process_user_query
 
 # Create your views here.
-
+results = None
 @api_view(['POST'])
 def signup(request):
     data = json.loads(request.body)
@@ -59,13 +59,13 @@ def send_question(request):
         # We will be getting or creating the chat history
         # call a function from the message modules folder
         results = process_user_query(question)
-        
+        print(results, 'results')
+            # "text": bot_response["answer"],
+            # "intent": bot_response["intent"]                                                      
         response={                            
             "_id": uuid.uuid4(),
-            # "text": bot_response["answer"],
-            "text": results,
+            "text": results.response,
             "sessionId": session_id,
-            # "intent": bot_response["intent"]                                                      
         } 
         return Response(response, status=status.HTTP_200_OK)
     except:
@@ -74,4 +74,27 @@ def send_question(request):
         print(traceback.format_exc())        
         # print("**********************************************************")    
         return Response("An error occured while sending your question", status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_predicted_questions(request):
+    session_id = request.data.get("sessionId")
+    print(session_id, 'session_id')
     
+    try:
+        
+        results = chat_bot_qeustion_predictions()
+        print(results, 'results**********')
+                                                 
+        response={                            
+            "text": results.response,
+            "sessionId": session_id,
+        } 
+        print(response, '-------________--------**______**response')
+        return Response(response, status=status.HTTP_200_OK)
+    except:
+        # Unmuted to see full error !!!!!!!!!
+        # print("**********************************************************")
+        print(traceback.format_exc())        
+        # print("**********************************************************")    
+        return Response("An error occured while getting predictions", status=status.HTTP_400_BAD_REQUEST)
