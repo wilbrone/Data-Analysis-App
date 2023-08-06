@@ -7,6 +7,8 @@ from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
 
+from analyst.modules.chat_bot import process_user_query
+
 # Create your views here.
 
 @api_view(['POST'])
@@ -43,6 +45,7 @@ def send_question(request):
         question_type = request.data.get("questionType")
         user_id = request.data.get("userId")        
         session_id = request.data.get("sessionId")
+        question = request.data.get("question")
 
         if user_id is None or user_id < 0:
             return Response("Missing User ID", status=status.HTTP_400_BAD_REQUEST)
@@ -55,11 +58,12 @@ def send_question(request):
 
         # We will be getting or creating the chat history
         # call a function from the message modules folder
-
+        results = process_user_query(question)
+        
         response={                            
             "_id": uuid.uuid4(),
             # "text": bot_response["answer"],
-            "text": " ",
+            "text": results,
             "sessionId": session_id,
             # "intent": bot_response["intent"]                                                      
         } 
