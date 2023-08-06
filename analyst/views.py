@@ -63,7 +63,7 @@ def send_question(request):
         
 
         print(results, 'results')
-                                                        
+
         response={                            
             "_id": uuid.uuid4(),
             "text": results.response,
@@ -77,6 +77,43 @@ def send_question(request):
         # print("**********************************************************")    
         return Response("An error occured while sending your question", status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def send_general_question(request):
+    results = None
+    try:
+        question_type = request.data.get("questionType")
+        user_id = request.data.get("userId")        
+        session_id = request.data.get("sessionId")
+        question = request.data.get("question")
+
+        if user_id is None or user_id < 0:
+            return Response("Missing User ID", status=status.HTTP_400_BAD_REQUEST)
+        if question_type=="text":
+            question = request.data.get("question")                                                
+            if isinstance(question, str)==False or len(question) == 0:
+                return Response("Seems like you sent an empty message :(", status=status.HTTP_200_OK)
+        elif question_type=="audio": 
+            return Response("Mmmmmh, Thank you for trying our audio message feature, unfornately we are still perfcting it...", status=status.HTTP_200_OK)                                                  
+
+        # We will be getting or creating the chat history
+        # call a function from the message modules folder
+        results = send_to_general(question)
+
+        print(results, 'results')
+
+        response={                            
+            "_id": uuid.uuid4(),
+            "text": results.response,
+            "sessionId": session_id,
+        } 
+        return Response(response, status=status.HTTP_200_OK)
+    except:
+        # Unmuted to see full error !!!!!!!!!
+        # print("**********************************************************")
+        print(traceback.format_exc())        
+        # print("**********************************************************")    
+        return Response("An error occured while sending your question", status=status.HTTP_400_BAD_REQUEST)
+    
 
 @api_view(['GET'])
 def get_predicted_questions(request):

@@ -146,6 +146,8 @@ def send_to_general(question):
     chat_engine = index.as_chat_engine(chat_mode="openai", verbose=True)
     chat_response = chat_engine.chat(question_prompt)
 
+    return chat_response
+
 
 
 def send_to_format_response(response, question):
