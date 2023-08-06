@@ -3,5 +3,6 @@
 .autogit
 virtual
 __pycache__
-media/*
+media/*.txt
+media/*.pdf
 *.pdf

@@ -12,9 +12,9 @@ documents = SimpleDirectoryReader('media').load_data()
 index = VectorStoreIndex.from_documents(documents, service_context=service_context)
 
 # Test on some sample data
-df = pd.DataFrame(
-    {"city": ["Toronto", "Tokyo", "Berlin"], "population": [2930000, 13960000, 3645000]},
-)
+# df = pd.DataFrame(
+#     {"city": ["Toronto", "Tokyo", "Berlin"], "population": [2930000, 13960000, 3645000]},
+# )
 
 # df = pd.DataFrame(
 #    documents

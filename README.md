@@ -26,6 +26,9 @@ NOTE: Incase you install additional package, always remember to update the requi
       To update the requirements file, Run `pip freeze > requirements.txt`. And `pip freeze` to check installed packages.
 
 ## Using DataSense
+* `api/send_question` Sending questions based on files and documents
+* `api/send_general_question` sending general datascience questions 
+* `api/get_predictions` getting question samples from the LLM based on your file or document
 * You can send your message to the api **send_question**. Your question should have the following format:-
     ```
     {
