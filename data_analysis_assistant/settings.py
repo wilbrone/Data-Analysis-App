@@ -37,7 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders'
+    'corsheaders',
+    "rest_framework",
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -80,8 +82,8 @@ CORS_ALLOW_METHODS = [
 ]
 
 if config('MODE')=='prod':    
-    CORS_ALLOWED_ORIGINS=CORS_ALLOW_METHODS.split(",")
-    ALLOWED_HOSTS = CORS_ALLOW_METHODS.split(",")
+    CORS_ALLOWED_ORIGINS=config('ALLOWED_HOSTS').split(",")
+    ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(",")
 else:
     ALLOWED_HOSTS = ["*"]
     CORS_ORIGIN_ALLOW_ALL = True
@@ -106,7 +108,7 @@ if config('MODE')=="dev":
             'USER': 'baron',
             'PASSWORD': 'Sahara@10322',
             'HOST': 'localhost',
-            'PORT': '',
+            'PORT': '5432',
         }
     }
 else:
@@ -121,6 +123,7 @@ ACTIVELOOP_TOKEN = config("ACTIVELOOP_TOKEN")
 ACTIVELOOP_USERNAME = config("ACTIVELOOP_USERNAME")
 GOOGLE_API_KEY = config("GOOGLE_API_KEY")
 GOOGLE_CSE_ID = config("GOOGLE_CSE_ID")
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -165,3 +168,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+# ['django.contrib.auth.backends.ModelBackend']
