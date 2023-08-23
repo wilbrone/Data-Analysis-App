@@ -44,14 +44,17 @@ def process_user_query(question):
         # query_engine = index.as_query_engine(response_mode="tree_summarize")
         # response = query_engine.query(question)
         prompt_question = f"""
-            You are an intelligent, powerful, compasionate, creative, polite and smart AI data science assistant, with the ability to do the most complex of data anaylsis when prompted by a user.
-            You can also provide a summary of the data when asked for a summary and provide accurate python code for data science algarithms in the respose
+            As an intelligent, powerful, compasionate, creative, polite and smart AI data science assistant, with the ability to do the most complex of data anaylsis when prompted by a user.
+            You can also perfom a summary of the data when asked for a summary and provide accurate python code for data science algarithms in the respose
 
-            You are asked to answer the following question:
+            Perform data analysis and provide guidance on how to write Python code to solve the problems. Data visualizations like tables, graphs and other presentations for the output
+            Create and provide appropriate data visualizations for downloading, like Peter Norvig and Isaac Newton. Use all the resource you have
+
+            Perfom the following action to the data:
             ==================
-            {question}
+            actions : {question}
             ==================
-            Scan the entire dataset.
+            Scan the entire dataset. and perform the actions on the data
         """
 
         query_engine = PandasQueryEngine(df=df, verbose=True, service_context=service_context)
@@ -136,17 +139,68 @@ def send_to_general(question):
 
     question_prompt = f"""
         You are an intelligent, compasionate, powerful, creative, witty, funny, polite and smart AI data science assistant, with the ability to do the most complex of data anaylsis when prompted by a user.
+        Help with data analysis and provide guidance on how to write Python code to solve the problems.
+
+        Create and provide appropriate data visualizations for downloading
 
         You are asked to answer the following question:
         ==================
         {question}
         ===================
+        If you need to use Python please access from the this environment, You have exclusive acees to this environment and its variables and following link: https://www.python.org/
     """
 
     chat_engine = index.as_chat_engine(chat_mode="openai", verbose=True)
     chat_response = chat_engine.chat(question_prompt)
 
     return chat_response
+
+
+def send_to_general_qw(question):
+    # Answer a general question
+
+    print("formated_response is None")
+
+    # Check if the question is a Python code execution request
+    if question.startswith("Calling function: python with args:"):
+        # Extract the Python code from the question
+        python_code = question.replace("Calling function: python with args:", "").strip()
+
+        tools = {
+        "python": {
+            "execute": lambda code: exec(code),
+        }
+    }
+
+        try:
+            # # Execute the extracted Python code
+            # exec(python_code)
+            # response = "Python code executed successfully"
+
+            # Use the "python" tool to execute the extracted Python code
+            tool_name = "python"
+            # tool = get_function_by_name(tools, tool_name)
+            tool_output = tool["execute"](python_code)
+            response = "Python code executed successfully"
+
+        except Exception as e:
+            response = f"Error while executing Python code: {str(e)}"
+    else:
+        # Normal question handling
+        question_prompt = f"""
+            You are an intelligent, compassionate, powerful, creative, witty, funny, polite, and smart AI data science assistant, with the ability to do the most complex data analysis when prompted by a user.
+
+            You are asked to answer the following question:
+            ==================
+            {question}
+            ===================
+        """
+
+        chat_engine = index.as_chat_engine(chat_mode="openai", verbose=True)
+        chat_response = chat_engine.chat(question_prompt)
+        response = chat_response['output']
+
+    return response
 
 
 
