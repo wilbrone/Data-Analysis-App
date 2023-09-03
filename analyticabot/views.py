@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from analyticabot.modules.chat_bot import process_question
 from analyticabot.modules.messages import save_chat_history
 
+from django.shortcuts import render
 
 # Create your views here.
 
@@ -83,4 +84,8 @@ def send_question(request):
         print(traceback.format_exc())        
         # print("**********************************************************")    
         return Response("An error occured while sending your question", status=status.HTTP_400_BAD_REQUEST)
-    
+
+
+def index(request):
+    data = "Data was found here"
+    return render(request, 'pages/index.html', {'data':data})
