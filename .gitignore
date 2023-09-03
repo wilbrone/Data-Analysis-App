@@ -4,5 +4,5 @@
 virtual
 __pycache__
 media/*.txt
-media/*.pdf
+media/*
 *.pdf
