@@ -7,7 +7,8 @@ from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
 
-from analyst.modules.chat_bot import chat_bot_qeustion_predictions, process_user_query, send_to_format_response, send_to_general
+from analyst.modules.chat_bot import chat_bot_qeustion_predictions, send_to_format_response, send_to_general
+from analyst.modules.messages import save_chat_history
 
 # Create your views here.
 results = None
@@ -40,44 +41,6 @@ def signup(request):
     
 
 @api_view(['POST'])
-def send_question(request):
-    results = None
-    try:
-        question_type = request.data.get("questionType")
-        user_id = request.data.get("userId")        
-        session_id = request.data.get("sessionId")
-        question = request.data.get("question")
-
-        if user_id is None or user_id < 0:
-            return Response("Missing User ID", status=status.HTTP_400_BAD_REQUEST)
-        if question_type=="text":
-            question = request.data.get("question")                                                
-            if isinstance(question, str)==False or len(question) == 0:
-                return Response("Seems like you sent an empty message :(", status=status.HTTP_200_OK)
-        elif question_type=="audio": 
-            return Response("Mmmmmh, Thank you for trying our audio message feature, unfornately we are still perfcting it...", status=status.HTTP_200_OK)                                                  
-
-        # We will be getting or creating the chat history
-        # call a function from the message modules folder
-        results = process_user_query(question)
-        
-
-        print(results, 'results')
-
-        response={                            
-            "_id": uuid.uuid4(),
-            "text": results.response,
-            "sessionId": session_id,
-        } 
-        return Response(response, status=status.HTTP_200_OK)
-    except:
-        # Unmuted to see full error !!!!!!!!!
-        # print("**********************************************************")
-        print(traceback.format_exc())        
-        # print("**********************************************************")    
-        return Response("An error occured while sending your question", status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['POST'])
 def send_general_question(request):
     results = None
     try:
@@ -99,13 +62,17 @@ def send_general_question(request):
         # call a function from the message modules folder
         results = send_to_general(question)
 
-        print(results, 'results')
+        print('results', results.get('response'))
 
         response={                            
             "_id": uuid.uuid4(),
-            "text": results.response,
+            "text": results.get('response'),
+            "file": results.get('file'),
             "sessionId": session_id,
-        } 
+        }
+
+        save_chat_history(question, results)
+
         return Response(response, status=status.HTTP_200_OK)
     except:
         # Unmuted to see full error !!!!!!!!!

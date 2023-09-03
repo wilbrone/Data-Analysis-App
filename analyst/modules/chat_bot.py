@@ -1,3 +1,5 @@
+import os
+import re
 from django.conf import settings
 from llama_index import OpenAIEmbedding, ServiceContext, VectorStoreIndex, SimpleDirectoryReader
 from llama_index.llms import OpenAI
@@ -5,6 +7,11 @@ import pandas as pd
 from llama_index.query_engine import PandasQueryEngine
 from langchain.vectorstores import DeepLake
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+from codeinterpreterapi import CodeInterpreterSession, File
+import base64
+
+from analyst.modules.messages import get_chat_history
 
 # Necessary to use the latest OpenAI models that support function calling API
 service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-3.5-turbo-0613"))
@@ -32,70 +39,6 @@ embeddings = OpenAIEmbedding(model="text-embedding-ada-002")
 # db = DeepLake(dataset_path=dataset_path, embedding=embeddings)
 
 # db.add_documents(docs)
-
-def process_user_query(question):
-    print(question,'ttettttrQQWW')
-    chat_response = None
-    example_convo = {
-        "User": "thank you",
-        "AI": "You are also capable of general conversation. Analyse the question if it it is not related to the dataset given please say so",
-    }
-    try:
-        # query_engine = index.as_query_engine(response_mode="tree_summarize")
-        # response = query_engine.query(question)
-        prompt_question = f"""
-            As an intelligent, powerful, compasionate, creative, polite and smart AI data science assistant, with the ability to do the most complex of data anaylsis when prompted by a user.
-            You can also perfom a summary of the data when asked for a summary and provide accurate python code for data science algarithms in the respose
-
-            Perform data analysis and provide guidance on how to write Python code to solve the problems. Data visualizations like tables, graphs and other presentations for the output
-            Create and provide appropriate data visualizations for downloading, like Peter Norvig and Isaac Newton. Use all the resource you have
-
-            Perfom the following action to the data:
-            ==================
-            actions : {question}
-            ==================
-            Scan the entire dataset. and perform the actions on the data
-        """
-
-        query_engine = PandasQueryEngine(df=df, verbose=True, service_context=service_context)
-        response = query_engine.query(prompt_question)
-        print(response, 'response---------######********************>>>>>>>')
-        formated_response = response.response
-
-        payload = {
-           "trial": formated_response
-        }
-
-        print(formated_response, 'formated_response---------######')
-
-        question_prompt = f"""
-            You are asked to answer the following question:
-            ==================
-            {question}
-            ===================
-            Given the Answer 
-            ==================
-            Answer: {formated_response}, 
-            ===================
-            Make your references to {df}, FORMAT Answer in conversational summary
-            If you cannot provide a conversational summary, MENTION you got the Answer, and explain why it is not so accurate.
-            You can also provide a summary of the data when asked for a summary and provide accurate python code for data science algarithms in the respose
-            ==================
-        """
-
-        chat_engine = index.as_chat_engine(chat_mode="openai", verbose=True)
-        chat_response = chat_engine.chat(question_prompt)
-        
-    
-
-        # display(Markdown(f"<b>{response}</b>"))
-
-        # chat_engine.chat_repl()
-        print(chat_response, 'response---------######')
-        return chat_response
-    except Exception as e:
-        print(e)
-
 
 
 def chat_bot_qeustion_predictions():
@@ -133,27 +76,43 @@ def chat_bot_qeustion_predictions():
         print(e)
 
 def send_to_general(question):
-    # Answer a genaral question
+    try:
+        # Create a session and reuse it for multiple requests if needed
+        with CodeInterpreterSession() as session:
+            # Define the user request
+            user_request = question
+            files = []  # Add files if needed
+            
+            chat_history = get_chat_history()
+            # Extend the chat history with the user's request
+            chat_history.append({'role': 'user', 'content': f"""{user_request}\n Do not return any code in your response"""})
 
-    print("formated_response is None")
+            my_string = f"""{chat_history}"""
 
-    question_prompt = f"""
-        You are an intelligent, compasionate, powerful, creative, witty, funny, polite and smart AI data science assistant, with the ability to do the most complex of data anaylsis when prompted by a user.
-        Help with data analysis and provide guidance on how to write Python code to solve the problems.
+            # Generate the response
+            response = session.generate_response_sync(my_string, files=files)
 
-        Create and provide appropriate data visualizations for downloading
+            # Output to the user
+            print("AI: ", response.content, '+****------>>', len(response.code_log))
+            
+            # Use regular expression to remove strings within triple backticks
+            output_string = re.sub(r'```python(.*?)```', '', response.content, flags=re.DOTALL)
+            
+            result = {
+                'response': output_string,
+            }
 
-        You are asked to answer the following question:
-        ==================
-        {question}
-        ===================
-        If you need to use Python please access from the this environment, You have exclusive acees to this environment and its variables and following link: https://www.python.org/
-    """
+            if response.files and response.code_log:
+                print('------------------------_>>>>>>>>>>>>>>>>>>>>>>>__<<<<<>>', response.code_log[0], len(response.code_log))
+                # result['file_names'] = [file.name for file in response.files]
+                result['file'] = [file[1] for file in response.code_log]
 
-    chat_engine = index.as_chat_engine(chat_mode="openai", verbose=True)
-    chat_response = chat_engine.chat(question_prompt)
+            return result
 
-    return chat_response
+    except Exception as e:  # Handle specific exceptions
+        # Handle the exception, log, or return an error message
+        print(f"Error: {e}")
+        return {'error': str(e)}
 
 
 def send_to_general_qw(question):

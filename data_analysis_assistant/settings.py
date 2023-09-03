@@ -115,6 +115,14 @@ else:
     pass
 
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+
 os.environ["OPENAI_API_KEY"] = config("OPENAI_API_KEY")
 os.environ["ACTIVELOOP_TOKEN"] = config("ACTIVELOOP_TOKEN")
 
