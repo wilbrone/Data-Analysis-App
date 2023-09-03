@@ -33,7 +33,7 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=10
 docs = text_splitter.create_documents(df)
 embeddings = OpenAIEmbedding(model="text-embedding-ada-002")
 
-full_file_path = os.path.join(settings.MEDIA_ROOT, '1YearCLEANED.csv')
+# full_file_path = os.path.join(settings.MEDIA_ROOT, '1YearCLEANED.csv')
 
 # my_activeloop_org_id = settings.ACTIVELOOP_USERNAME
 # my_activeloop_dataset_name = "data_sense_titanic_train"
@@ -87,7 +87,7 @@ def send_to_general(question):
             user_request = question
             files = [
                 # File(full_file_path)
-                File.from_path(full_file_path),
+                # File.from_path(full_file_path)
             ]  # Add files if needed
             
             chat_history = get_chat_history()
