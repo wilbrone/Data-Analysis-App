@@ -1,0 +1,9 @@
+*.pyc
+.env
+.autogit
+my_env
+__pycache__
+media
+media/*
+*.pdf
+.codebox/
