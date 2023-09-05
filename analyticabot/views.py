@@ -1,6 +1,7 @@
 import json
 import traceback
 import uuid
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -11,9 +12,13 @@ from analyticabot.modules.chat_bot import process_question
 from analyticabot.modules.messages import save_chat_history
 
 from django.shortcuts import render
+from django.http import HttpResponse
 
 # Create your views here.
 
+global count 
+count = 0
+data = []
 
 @api_view(['POST'])
 def signup(request):
@@ -45,7 +50,7 @@ def signup(request):
 
 
 @api_view(['POST'])
-def send_question(request):
+def send_question_II(request):
     results = None
     try:
         question_type = request.data.get("questionType")
@@ -88,4 +93,27 @@ def send_question(request):
 
 def index(request):
     data = "Data was found here"
-    return render(request, 'pages/index.html', {'data':data})
+    return render(request, 'pages/index.html')
+
+
+def send_question(request):
+    global count 
+    count += 1
+
+    if request.method == 'POST':
+        prompt = request.POST.get('prompt')  # Get the data from the textarea input
+        print(prompt, '--------------------#################')
+        # Process the prompt data here, e.g., save it to a database, perform some actions, etc.
+        # Redirect to a success page or perform any necessary response action
+        # return HttpResponseRedirect('/success/')  # Replace '/success/' with your desired success URL
+
+        data = "Try again"
+
+        print(data, '#################')
+        # Prepare the data you want to return as JSON
+        response_data = {'result': 'Your data processed successfully.', 'data':data}
+        
+        # return HttpResponse(json.dumps(response_data), content_type="application/json")  # Return JSON responseresponse_data)  # Return JSON response
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    
+    return render(request, 'pages/index.html')  # Replace 'your_template.html' with the actual template name
