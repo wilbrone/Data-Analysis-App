@@ -10,6 +10,7 @@ from analyticabot.modules.messages import get_chat_history
 full_file_path = os.path.join(settings.MEDIA_ROOT, 'online_retail_II.xlsx')
 
 def process_question(question):
+    print(question, '------------------------')
     try:
         # result = None
         # Create a session and reuse it for multiple requests if needed

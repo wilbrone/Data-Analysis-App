@@ -20,6 +20,11 @@
                 <hr style="position: absolute;
                 width: 22%;
                 bottom: 6.5rem;">
+                <ul>
+                    {% for file in media_files %}
+                      <li>{{ file }}</li>
+                    {% endfor %}
+                </ul>
 
                 <div class="card shadow-sm bg-transparent" style="position: absolute; bottom: 2rem; width: 22%;">
                     <div class="card-body d-flex align-items-center" style="padding: 3px 10px;color:azure;">
@@ -45,13 +50,16 @@
                     Data Analysis Asistant
                 </h3>
                 <div style="height: 80%;">
-                    <div id="chatHistoryContainer"></div>
+                    <!-- <div id="chatHistoryContainer"></div>
                     <div>
-                        {{data.role}}
+                        
+                    </div> -->
+                    <div id="chat-container">
+                        <!-- Chat messages will be displayed here -->
                     </div>
 
                 </div>
-                <form id="myForm" style="background-color: white; position: absolute; bottom: 0;width: 100%;">
+                <!-- <form id="myForm" style="background-color: white; position: absolute; bottom: 0;width: 100%;">
                     {% csrf_token %}
                     <div class="mb-3" 
                     style="
@@ -69,13 +77,80 @@
                     >
                         Send
                     </button>
+                </form> -->
+
+               
+            
+
+                <form id="message-form">
+                    {% csrf_token %}
+                    <input type="text" id="user-input" placeholder="Type a message..." />
+                    <button type="submit">Send</button>
                 </form>
             </section>
         </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var chatContainer = document.getElementById("chat-container");
+            var messageForm = document.getElementById("message-form");
+            var userInput = document.getElementById("user-input");
+
+            messageForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                // Get the CSRF token from the hidden input field
+                var csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+
+                // Get the user's message from the input field
+                var userMessage = userInput.value;
+
+                // Add the user's message to the chat container
+                chatContainer.innerHTML += "<p>User: " + userMessage + "</p>";
+
+                var usrMsgs = {
+                    "userId": 2,
+                    "sessionId":1, 
+                    "questionType":"text", 
+                    "question":userMessage
+                    
+                };
+                console.log(usrMsgs, '#######');
+                // Clear the input field
+                userInput.value = "";
+
+                // Send the user's message to the Django view for processing
+                fetch("http://localhost:8000/api/send_question", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken, // Include the CSRF token in the request headers
+
+                    },
+                    // beforeSend: function(xhr, settings) {
+                    //     xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    // },
+                    body: JSON.stringify({ message: usrMsgs }),
+                })
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        console.log(data, 'rreets------');
+                        // Display the response from the Django view
+                        chatContainer.innerHTML += "<p>AI: <pre>" + data.response.text + "</pre></p>";
+                    })
+                    .catch(function (error) {
+                        console.error("Error sending message:", error);
+                    });
+            });
+        });
+
+    </script>
+    <!-- <script type="text/javascript">
         
         var results = []
         localStorage.clear()
@@ -124,18 +199,37 @@
         }
 
 
+        // function displayChatHistory(history) {
+        //     console.log(history);
+        //     var container = $("#chatHistoryContainer");
+
+        //     for (var i = 0; i < history.length; i++) {
+        //         var item = history[i];
+        //         var role = item.role;
+        //         var content = item.content;
+
+        //         // Only display user messages with meaningful content
+        //         if (role === 'user' && content.trim() === '') {
+        //             continue; // Skip empty user messages
+        //         }
+
+        //         // Create a chat message element
+        //         var messageElement = document.createElement("div");
+        //         messageElement.textContent = role + ": " + content;
+
+        //         // Append the message to the container
+        //         container.append(messageElement);
+        //     }
+        // }
+
         function displayChatHistory(history) {
             var container = $("#chatHistoryContainer");
+            var lastRole = null; // Track the role of the last displayed message
 
             for (var i = 0; i < history.length; i++) {
                 var item = history[i];
                 var role = item.role;
                 var content = item.content;
-
-                // Only display user messages with meaningful content
-                if (role === 'user' && content.trim() === '') {
-                    continue; // Skip empty user messages
-                }
 
                 // Create a chat message element
                 var messageElement = document.createElement("div");
@@ -143,8 +237,11 @@
 
                 // Append the message to the container
                 container.append(messageElement);
+
+                // Update the lastRole
+                lastRole = role;
             }
         }
         
-    </script>
+    </script> -->
 {% endblock %}

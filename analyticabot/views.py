@@ -14,6 +14,8 @@ from analyticabot.modules.messages import save_chat_history
 from django.shortcuts import render
 from django.http import HttpResponse
 
+from analyticabot.modules.utils import list_media_files
+
 # Create your views here.
 
 global count 
@@ -25,6 +27,7 @@ def signup(request):
     data = json.loads(request.body)
     print(data, 'DATA.....')
     try:
+        
         # first_name = data.get("first_name")
         # last_name = data.get("last_name")
         username = data.get("username")
@@ -50,39 +53,44 @@ def signup(request):
 
 
 @api_view(['POST'])
-def send_question_II(request):
+def send_question(request):
     results = None
     try:
-        question_type = request.data.get("questionType")
-        user_id = request.data.get("userId")        
-        session_id = request.data.get("sessionId")
-        question = request.data.get("question")
+        if request.method == 'POST':
+            user_message = json.loads(request.body.decode('utf-8'))['message']
+            question_type = user_message.get("questionType")
+            user_id = user_message.get("userId")        
+            session_id = user_message.get("sessionId")
+            question = user_message.get("question")
 
-        if user_id is None or user_id < 0:
-            return Response("Missing User ID", status=status.HTTP_400_BAD_REQUEST)
-        if question_type=="text":
-            question = request.data.get("question")                                                
-            if isinstance(question, str)==False or len(question) == 0:
-                return Response("Seems like you sent an empty message :(", status=status.HTTP_200_OK)
-        elif question_type=="audio": 
-            return Response("Mmmmmh, Thank you for trying our audio message feature, unfornately we are still perfcting it...", status=status.HTTP_200_OK)                                                  
+            print(question, isinstance(question, str), type(question))
 
-        # We will be getting or creating the chat history
-        # call a function from the message modules folder
-        results = process_question(question)
+            if user_id is None or user_id < 0:
+                return Response("Missing User ID", status=status.HTTP_400_BAD_REQUEST)
+            if question_type=="text":
+                # question = request.data.get("question")                                                
+                if isinstance(question, str)==False or len(question) == 0:
+                    return Response("Seems like you sent an empty message :(", status=status.HTTP_200_OK)
+            elif question_type=="audio": 
+                return Response("Mmmmmh, Thank you for trying our audio message feature, unfornately we are still perfcting it...", status=status.HTTP_200_OK)                                                  
 
-        print('results', results.get('response'))
+            # We will be getting or creating the chat history
+            # call a function from the message modules folder
+            results = process_question(question)
 
-        response={                            
-            "_id": uuid.uuid4(),
-            "text": results.get('response'),
-            "file": results.get('file'),
-            "sessionId": session_id,
-        }
+            print('results', results.get('response'))
 
-        save_chat_history(question, results)
-        
-        return Response(response, status=status.HTTP_200_OK)
+            response={                            
+                "_id": uuid.uuid4(),
+                "text": results.get('response'),
+                "file": results.get('file'),
+                "sessionId": session_id,
+            }
+
+            save_chat_history(question, results)
+            
+            # return Response(response, status=status.HTTP_200_OK)
+            return JsonResponse({'response': response})
     except:
         # Unmuted to see full error !!!!!!!!!
         # print("**********************************************************")
@@ -96,24 +104,28 @@ def index(request):
     return render(request, 'pages/index.html')
 
 
-def send_question(request):
+def send_question_II(request):
     global count 
     count += 1
 
     if request.method == 'POST':
-        prompt = request.POST.get('prompt')  # Get the data from the textarea input
-        print(prompt, '--------------------#################')
-        # Process the prompt data here, e.g., save it to a database, perform some actions, etc.
-        # Redirect to a success page or perform any necessary response action
-        # return HttpResponseRedirect('/success/')  # Replace '/success/' with your desired success URL
+        # Process the user's message
+        user_message = json.loads(request.body.decode('utf-8'))['message']
+        print(user_message, 'ÄÄÄÄÄÄÄÄ')
+        # Generate a response
+        ai_response = "This is the response from the AI."
 
-        data = "Try again"
-
-        print(data, '#################')
-        # Prepare the data you want to return as JSON
-        response_data = {'result': 'Your data processed successfully.', 'data':data}
-        
-        # return HttpResponse(json.dumps(response_data), content_type="application/json")  # Return JSON responseresponse_data)  # Return JSON response
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+        # Return the response as JSON
+        return JsonResponse({'response': ai_response})
     
-    return render(request, 'pages/index.html')  # Replace 'your_template.html' with the actual template name
+
+def your_view(request):
+    # Get the list of file names in the media folder
+    media_files = list_media_files()
+
+    # You can now pass this list to your template context
+    context = {
+        'media_files': media_files,
+    }
+
+    return render(request, 'pages/index.html', context)
