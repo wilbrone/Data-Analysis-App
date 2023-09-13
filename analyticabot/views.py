@@ -119,13 +119,14 @@ def send_question_II(request):
         return JsonResponse({'response': ai_response})
     
 
-def your_view(request):
-    # Get the list of file names in the media folder
-    media_files = list_media_files()
+def get_user_files(request):
+    if request.method == 'GET':
+        # Get the list of file names in the media folder
+        media_files = list_media_files()
 
-    # You can now pass this list to your template context
-    context = {
-        'media_files': media_files,
-    }
+        # You can now pass this list to your template context
+        context = {
+            'media_files': media_files,
+        }
 
-    return render(request, 'pages/index.html', context)
+        return JsonResponse({'response': context})

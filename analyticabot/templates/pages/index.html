@@ -20,10 +20,10 @@
                 <hr style="position: absolute;
                 width: 22%;
                 bottom: 6.5rem;">
-                <ul>
-                    {% for file in media_files %}
-                      <li>{{ file }}</li>
-                    {% endfor %}
+                <ul id="files" style="padding-left: 2rem;
+                position: absolute;
+                bottom: 150px;">
+                      <!-- <li>{{ file }}</li> -->
                 </ul>
 
                 <div class="card shadow-sm bg-transparent" style="position: absolute; bottom: 2rem; width: 22%;">
@@ -49,7 +49,7 @@
                 <h3 class="text-3xl font-bold" style="text-align: center;">
                     Data Analysis Asistant
                 </h3>
-                <div style="height: 80%;">
+                <div style="height: 75%;overflow-y: scroll;padding: 1rem;">
                     <!-- <div id="chatHistoryContainer"></div>
                     <div>
                         
@@ -59,7 +59,7 @@
                     </div>
 
                 </div>
-                <!-- <form id="myForm" style="background-color: white; position: absolute; bottom: 0;width: 100%;">
+                <form id="message-form" style="background-color: white; position: absolute; bottom: 0;width: 100%;">
                     {% csrf_token %}
                     <div class="mb-3" 
                     style="
@@ -68,25 +68,25 @@
                         background-color: white;"
                     >
                         <label for="exampleFormControlTextarea1" class="form-label" style="font-size: 13px;">Write your prompt</label>
-                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="prompt"></textarea>
+                        <textarea type="text" id="user-input" placeholder="Type a message..." class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
                     </div>
-                    <button type="button" id="submitButton" class="btn btn-outline-secondary" onclick="submitData()" style="
+                    <button type="submit" id="submitButton" class="btn btn-outline-secondary" style="
                     bottom: 30;
                     right: 130;
                     width: 7%;"
                     >
                         Send
                     </button>
-                </form> -->
+                </form>
 
                
             
 
-                <form id="message-form">
+                <!-- <form id="message-form">
                     {% csrf_token %}
                     <input type="text" id="user-input" placeholder="Type a message..." />
                     <button type="submit">Send</button>
-                </form>
+                </form> -->
             </section>
         </div>
     </div>
@@ -97,6 +97,33 @@
             var chatContainer = document.getElementById("chat-container");
             var messageForm = document.getElementById("message-form");
             var userInput = document.getElementById("user-input");
+            var filesCollected = document.getElementById("files");
+
+            // Send a GET request to your Django view on page load
+            fetch("http://localhost:8000/api/get_user_files", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json", // Set the content type if needed
+                },
+            })
+            .then(function (response) {
+                console.log(response);
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json(); // Assuming your view returns JSON data
+            })
+            .then(function (data) {
+                // Handle the response data as needed
+                console.log(data.response.media_files);
+                data.response.media_files.forEach(element => {
+                    filesCollected.innerHTML += "<li>" + element + "</li>"
+                });
+            })
+            .catch(function (error) {
+                console.error("Error:", error);
+            });
+
 
             messageForm.addEventListener("submit", function (e) {
                 e.preventDefault();
@@ -109,7 +136,7 @@
                 var userMessage = userInput.value;
 
                 // Add the user's message to the chat container
-                chatContainer.innerHTML += "<p>User: " + userMessage + "</p>";
+                chatContainer.innerHTML += "<p style='padding:1.5rem'>User: " + userMessage + "</p>";
 
                 var usrMsgs = {
                     "userId": 2,
@@ -141,7 +168,23 @@
                     .then(function (data) {
                         console.log(data, 'rreets------');
                         // Display the response from the Django view
-                        chatContainer.innerHTML += "<p>AI: <pre>" + data.response.text + "</pre></p>";
+                        // chatContainer.innerHTML += "<p>AI: <pre style='line-height: 1;font-family: inherit;'>" + data.response.text | safe + "</pre></p>";
+
+                        // chatContainer.innerHTML += "<p>AI: <pre style='line-height: 1;font-family: inherit;background-color:#f7f7f8;padding:1rem'>"+data.response.text+"</pre></p>";
+                        chatContainer.innerHTML += "<p>AI: <p style='line-height: 1.6;font-family: inherit;background-color:#f7f7f8;overflow-x: hidden;overflow-y: hidden;white-space: pre-wrap;padding:1rem !important;'>"+data.response.text+"</p></p>";
+
+                        // chatContainer.innerHTML += "<p>AI: <pre style='line-height: 1;font-family: inherit;background-color:#f7f7f8;'></pre></p>";
+                        // chatContainer.innerHTML += data.response.text
+
+                        // Check if the 'file' array contains an image
+                        if (data.response.file.length > 0) {
+                            img_index = data.response.file.length
+                            // Display the image
+                            // data.response.file.forEach(el =>{
+                            chatContainer.innerHTML += "<img src='data:image/png;base64," + data.response.file[img_index-1] + "' alt='Image' />";
+
+                            // })
+                        }
                     })
                     .catch(function (error) {
                         console.error("Error sending message:", error);

@@ -10,7 +10,7 @@ from analyticabot.modules.messages import get_chat_history
 full_file_path = os.path.join(settings.MEDIA_ROOT, 'online_retail_II.xlsx')
 
 def process_question(question):
-    print(question, '------------------------')
+    print(question, '------------------------', full_file_path)
     try:
         # result = None
         # Create a session and reuse it for multiple requests if needed
@@ -38,12 +38,12 @@ def process_question(question):
                 'content': f"""{user_request}
                 NOTE: Be Professional, Precise, and Informative. Perform thorough and thoughtful analyses to assist with decision-making. Handle missing values and clean the dataset when possible. Avoid including any code in your final response to me.
                 In case of errors in the dataset, please clean it and continue. If it's impossible, inform me and provide suggestions on resolving the issue.
-                Always anticipate my needs and act accordingly.
+                Always anticipate my needs and act accordingly. If the there is code to interprete pleaese do so and give me the result using interpreter
                 If you encounter an openai.error.InvalidRequestError, find a smart way to truncate messages by keeping the latest messages to reduce the message's token count.
                 """
             })
             # sent_q = f"""{user_request}\n NOTE: Do not return any code in your response. If there is an error in the dataset please clean it and continue. If it is impossible let me know about it and give me suggestions on how you can help solve the error. Always predict what I want next and act on it"""
-            my_string = f"""{chat_history[-4:]}"""
+            my_string = f"""{chat_history}"""
             print(my_string, '-----<---<--<-<-<-')
             
             # Generate the response
