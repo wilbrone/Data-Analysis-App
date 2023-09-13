@@ -14,7 +14,9 @@ from analyticabot.modules.messages import save_chat_history
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from analyticabot.modules.utils import list_media_files
+from analyticabot.modules.utils import list_media_files, FileUploadForm
+from django.shortcuts import render
+from django.views.generic.edit import FormView
 
 # Create your views here.
 
@@ -130,3 +132,15 @@ def get_user_files(request):
         }
 
         return JsonResponse({'response': context})
+
+
+
+
+class FileUploadView(FormView):
+    template_name = 'upload.html'
+    form_class = FileUploadForm
+    success_url = '/'
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)

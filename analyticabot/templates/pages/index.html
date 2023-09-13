@@ -20,11 +20,31 @@
                 <hr style="position: absolute;
                 width: 22%;
                 bottom: 6.5rem;">
-                <ul id="files" style="padding-left: 2rem;
+                <!-- <ul id="files" style="padding-left: 2rem;
                 position: absolute;
                 bottom: 150px;">
-                      <!-- <li>{{ file }}</li> -->
-                </ul>
+                      <!-- <li>{{ file }}</li>
+                </ul> -->
+                <div style="padding-left: 2rem;
+                position: absolute;
+                bottom: 150px;">
+                    <h1>Upload a File</h1>
+                    <form>
+                        {% csrf_token %}
+                        <!-- {{ form.as_p }} -->
+                        <button type="submit" class="btn btn-outline-secondary">Upload</button>
+                    </form>
+
+                    <h2>Uploaded Files</h2>
+                    <ul>
+                        <!-- {% for file in uploaded_files %} -->
+                            <li>
+                                <!-- <input type="radio" name="file_radio" value="{{ file.file_name }}">
+                                {{ file.file_name }} -->
+                            </li>
+                        <!-- {% endfor %} -->
+                    </ul>                
+                </div>
 
                 <div class="card shadow-sm bg-transparent" style="position: absolute; bottom: 2rem; width: 22%;">
                     <div class="card-body d-flex align-items-center" style="padding: 3px 10px;color:azure;">
