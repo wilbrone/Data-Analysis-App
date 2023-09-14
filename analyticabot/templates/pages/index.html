@@ -120,29 +120,29 @@
             var filesCollected = document.getElementById("files");
 
             // Send a GET request to your Django view on page load
-            fetch("https://sheltered-sea-55779-e7c05a3c334d.herokuapp.com/api/get_user_files", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json", // Set the content type if needed
-                },
-            })
-            .then(function (response) {
-                console.log(response);
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.json(); // Assuming your view returns JSON data
-            })
-            .then(function (data) {
-                // Handle the response data as needed
-                console.log(data.response.media_files);
-                data.response.media_files.forEach(element => {
-                    filesCollected.innerHTML += "<li>" + element + "</li>"
-                });
-            })
-            .catch(function (error) {
-                console.error("Error:", error);
-            });
+            // fetch("https://sheltered-sea-55779-e7c05a3c334d.herokuapp.com/api/get_user_files", {
+            //     method: "GET",
+            //     headers: {
+            //         "Content-Type": "application/json", // Set the content type if needed
+            //     },
+            // })
+            // .then(function (response) {
+            //     console.log(response);
+            //     if (!response.ok) {
+            //         throw new Error("Network response was not ok");
+            //     }
+            //     return response.json(); // Assuming your view returns JSON data
+            // })
+            // .then(function (data) {
+            //     // Handle the response data as needed
+            //     console.log(data.response.media_files);
+            //     data.response.media_files.forEach(element => {
+            //         filesCollected.innerHTML += "<li>" + element + "</li>"
+            //     });
+            // })
+            // .catch(function (error) {
+            //     console.error("Error:", error);
+            // });
 
 
             messageForm.addEventListener("submit", function (e) {
