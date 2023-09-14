@@ -120,7 +120,7 @@
             var filesCollected = document.getElementById("files");
 
             // Send a GET request to your Django view on page load
-            fetch("http://localhost:8000/api/get_user_files", {
+            fetch("https://sheltered-sea-55779-e7c05a3c334d.herokuapp.com/api/get_user_files", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json", // Set the content type if needed
@@ -169,8 +169,9 @@
                 // Clear the input field
                 userInput.value = "";
 
-                // Send the user's message to the Django view for processing
-                fetch("http://localhost:8000/api/send_question", {
+                // Send the user's message to the Django view for processing https://sheltered-sea-55779-e7c05a3c334d.herokuapp.com
+                // fetch("http://localhost:8000/api/send_question", {
+                fetch("https://sheltered-sea-55779-e7c05a3c334d.herokuapp.com/api/send_question", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
