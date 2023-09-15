@@ -15,7 +15,7 @@ from analyticabot.modules.messages import save_chat_history
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from analyticabot.modules.utils import list_media_files, FileUploadForm
+from analyticabot.modules.utils import list_media_files
 from django.shortcuts import render
 from django.views.generic.edit import FormView
 from django.conf import settings
