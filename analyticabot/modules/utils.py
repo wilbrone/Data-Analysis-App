@@ -1,7 +1,6 @@
 import os
 from django.conf import settings
 from django import forms
-from ..models import UploadedFile
 
 def list_media_files():
     # Define the media root directory
