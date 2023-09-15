@@ -7,9 +7,9 @@ from django.conf import settings
 
 from analyticabot.modules.messages import get_chat_history
 
-full_file_path = os.path.join(settings.MEDIA_ROOT, 'online_retail_II.xlsx')
 
-def process_question(question):
+def process_question(question, file):
+    full_file_path = os.path.join(settings.MEDIA_ROOT, 'user_id/'+file)
     print(question, '------------------------', full_file_path)
     try:
         # result = None

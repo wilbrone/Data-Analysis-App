@@ -29,19 +29,29 @@
                 position: absolute;
                 bottom: 150px;">
                     <h1>Upload a File</h1>
-                    <form>
+                    <!-- <form>
                         {% csrf_token %}
-                        <!-- {{ form.as_p }} -->
+                        <!-- {{ form.as_p }}
                         <button type="submit" class="btn btn-outline-secondary">Upload</button>
+                    </form> -->
+
+                    <form id="file-upload-form" method="post" enctype="multipart/form-data" style="display: grid;">
+                        {% csrf_token %}
+                        <input type="file" name="file" id="file" accept=".csv, .xlsx">
+                        <button type="submit" class="btn btn-outline-secondary" style="width: 50%;
+                        margin-top: 1rem;
+                        color: white;">
+                            Upload
+                        </button>
                     </form>
 
                     <h2>Uploaded Files</h2>
-                    <ul>
+                    <ul id="files">
                         <!-- {% for file in uploaded_files %} -->
-                            <li>
+                            <!-- <li> -->
                                 <!-- <input type="radio" name="file_radio" value="{{ file.file_name }}">
                                 {{ file.file_name }} -->
-                            </li>
+                            <!-- </li> -->
                         <!-- {% endfor %} -->
                     </ul>                
                 </div>
@@ -79,6 +89,7 @@
                     </div>
 
                 </div>
+
                 <form id="message-form" style="background-color: white; position: absolute; bottom: 0;width: 100%;">
                     {% csrf_token %}
                     <div class="mb-3" 
@@ -89,6 +100,9 @@
                     >
                         <label for="exampleFormControlTextarea1" class="form-label" style="font-size: 13px;">Write your prompt</label>
                         <textarea type="text" id="user-input" placeholder="Type a message..." class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                    </div>
+                    <div class="spinner-grow text-light" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
                     <button type="submit" id="submitButton" class="btn btn-outline-secondary" style="
                     bottom: 30;
@@ -118,7 +132,13 @@
             var messageForm = document.getElementById("message-form");
             var userInput = document.getElementById("user-input");
             var filesCollected = document.getElementById("files");
+            var myVariable = "{{ mode }}";
+            var url = ''
+            var fileToQuery = ''
 
+            var formData = document.getElementById("file-upload-form")
+
+            console.log(myVariable, 'ÄÄÄÄÄÄÄÄ');
             // Send a GET request to your Django view on page load
             // fetch("https://sheltered-sea-55779-e7c05a3c334d.herokuapp.com/api/get_user_files", {
             //     method: "GET",
@@ -144,6 +164,43 @@
             //     console.error("Error:", error);
             // });
 
+            if(myVariable === 'dev'){
+                url = 'http://localhost:8000/api';
+            }
+            else {
+                url = 'https://sheltered-sea-55779-e7c05a3c334d.herokuapp.com/api';
+            }
+
+
+            formData.addEventListener("submit", function (event) {
+                event.preventDefault();
+                
+                var formData = new FormData(this);
+                console.log(formData, 'upload_view###########');
+                fetch("{% url 'upload_view' %}", {
+                    method: "POST",
+                    body: formData,
+                    // headers: {
+                    //     "Content-Type": "application/json",
+                    //     "X-CSRFToken": csrfToken, // Include the CSRF token in the request headers
+
+                    // },
+
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response from the server, e.g., show a success message
+                    console.log(data);
+                    fileToQuery = data.file_name
+                    filesCollected.innerHTML += "<li>" + data.file_name + "</li>"
+                })
+                .catch(error => {
+                    // Handle any errors that occur during the fetch
+                    console.error(error);
+                });
+                
+            });
+
 
             messageForm.addEventListener("submit", function (e) {
                 e.preventDefault();
@@ -162,16 +219,17 @@
                     "userId": 2,
                     "sessionId":1, 
                     "questionType":"text", 
-                    "question":userMessage
+                    "question":userMessage,
+                    "file": fileToQuery
                     
                 };
-                console.log(usrMsgs, '#######');
+                console.log(usrMsgs, '#######', fileToQuery);
                 // Clear the input field
                 userInput.value = "";
 
                 // Send the user's message to the Django view for processing https://sheltered-sea-55779-e7c05a3c334d.herokuapp.com
-                // fetch("http://localhost:8000/api/send_question", {
-                fetch("https://sheltered-sea-55779-e7c05a3c334d.herokuapp.com/api/send_question", {
+                fetch("{% url 'send_question' %}", {
+                // fetch(`${url}/send_question`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

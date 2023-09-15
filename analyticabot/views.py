@@ -1,4 +1,5 @@
 import json
+import os
 import traceback
 import uuid
 from django.http import JsonResponse
@@ -17,6 +18,7 @@ from django.http import HttpResponse
 from analyticabot.modules.utils import list_media_files, FileUploadForm
 from django.shortcuts import render
 from django.views.generic.edit import FormView
+from django.conf import settings
 
 # Create your views here.
 
@@ -64,6 +66,7 @@ def send_question(request):
             user_id = user_message.get("userId")        
             session_id = user_message.get("sessionId")
             question = user_message.get("question")
+            file = user_message.get("file")
 
             print(question, isinstance(question, str), type(question))
 
@@ -78,7 +81,7 @@ def send_question(request):
 
             # We will be getting or creating the chat history
             # call a function from the message modules folder
-            results = process_question(question)
+            results = process_question(question, file)
 
             print('results', results.get('response'))
 
@@ -103,7 +106,8 @@ def send_question(request):
 
 def index(request):
     data = "Data was found here"
-    return render(request, 'pages/index.html')
+    mode = settings.MODE
+    return render(request, 'pages/index.html', {'mode': mode})
 
 
 def send_question_II(request):
@@ -135,12 +139,36 @@ def get_user_files(request):
 
 
 
+def upload_view(request):
+    if request.method == 'POST' and request.FILES['file']:
+        uploaded_file = request.FILES['file']
+        print(uploaded_file, 'ÄÄÄÄÄÄÄÄÄÄÄÄ', uploaded_file.name)
 
-class FileUploadView(FormView):
-    template_name = 'upload.html'
-    form_class = FileUploadForm
-    success_url = '/'
+        media_root = settings.MEDIA_ROOT
+    
+        # Create a directory based on the user ID if it doesn't exist
+        user_folder_path = os.path.join(media_root, 'user_id')
+        if not os.path.exists(user_folder_path):
+            os.makedirs(user_folder_path)
+        
+        # Save the uploaded file to the user's folder
+        file_path = os.path.join(user_folder_path, uploaded_file.name)
+        with open(file_path, 'wb+') as destination:
+            for chunk in uploaded_file.chunks():
+                destination.write(chunk)
+        
 
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
+        print(file_path)
+        # If you want to save the file to the database, create a new UploadedFile instance and save it.
+        # uploaded_file_instance = UploadedFile(file=uploaded_file)
+        # uploaded_file_instance.save()
+        
+        # You can also save the file to a specific directory.
+        # file deepcode ignore PT: <please specify a reason of ignoring this>
+        # with open('uploads/' + uploaded_file.name, 'wb+') as destination:
+        #     for chunk in uploaded_file.chunks():
+        #         destination.write(chunk)
+        
+        return JsonResponse({'message': 'File uploaded successfully', 'file_name': uploaded_file.name})
+    else:
+        return JsonResponse({'message': 'No file provided'}, status=400)
