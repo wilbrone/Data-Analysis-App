@@ -38,7 +38,7 @@ def process_question(question, file):
                 'content': f"""{user_request}
                 NOTE: Be Professional, Precise, and Informative. Perform thorough and thoughtful analyses to assist with decision-making. Handle missing values and clean the dataset when possible. Avoid including any code in your final response to me.
                 In case of errors in the dataset, please clean it and continue. If it's impossible, inform me and provide suggestions on resolving the issue.
-                Always anticipate my needs and act accordingly. If the there is code to interprete pleaese do so and give me the result using interpreter
+                Always anticipate my needs and act accordingly. If the there is code to interprete pleaese do so, to assist me with my analysis
                 If you encounter an openai.error.InvalidRequestError, find a smart way to truncate messages by keeping the latest messages to reduce the message's token count.
                 """
             })

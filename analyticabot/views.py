@@ -158,6 +158,9 @@ def upload_view(request):
                 destination.write(chunk)
         
 
+        question = ""
+        process_question(question, uploaded_file.name)
+
         print(file_path)
         # If you want to save the file to the database, create a new UploadedFile instance and save it.
         # uploaded_file_instance = UploadedFile(file=uploaded_file)
