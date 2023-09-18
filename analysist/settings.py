@@ -116,8 +116,7 @@ if config('MODE')=="dev":
             'PORT': '5432',
         }
     }
-else:
-    pass
+
 
 
 os.environ["OPENAI_API_KEY"] = config("OPENAI_API_KEY")
