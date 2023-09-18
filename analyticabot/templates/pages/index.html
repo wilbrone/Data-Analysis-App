@@ -45,7 +45,7 @@
                         </button>
                     </form>
 
-                    <h2>Uploaded Files</h2>
+                    <h2 style="font-weight: bolder;">Uploaded Files</h2>
                     <ul id="files">
                         <!-- {% for file in uploaded_files %} -->
                             <!-- <li> -->
@@ -139,30 +139,7 @@
             var formData = document.getElementById("file-upload-form")
 
             console.log(myVariable, 'ÄÄÄÄÄÄÄÄ');
-            // Send a GET request to your Django view on page load
-            // fetch("https://sheltered-sea-55779-e7c05a3c334d.herokuapp.com/api/get_user_files", {
-            //     method: "GET",
-            //     headers: {
-            //         "Content-Type": "application/json", // Set the content type if needed
-            //     },
-            // })
-            // .then(function (response) {
-            //     console.log(response);
-            //     if (!response.ok) {
-            //         throw new Error("Network response was not ok");
-            //     }
-            //     return response.json(); // Assuming your view returns JSON data
-            // })
-            // .then(function (data) {
-            //     // Handle the response data as needed
-            //     console.log(data.response.media_files);
-            //     data.response.media_files.forEach(element => {
-            //         filesCollected.innerHTML += "<li>" + element + "</li>"
-            //     });
-            // })
-            // .catch(function (error) {
-            //     console.error("Error:", error);
-            // });
+            
 
             if(myVariable === 'dev'){
                 url = 'http://localhost:8000/api';
@@ -250,7 +227,7 @@
                         // chatContainer.innerHTML += "<p>AI: <pre style='line-height: 1;font-family: inherit;'>" + data.response.text | safe + "</pre></p>";
 
                         // chatContainer.innerHTML += "<p>AI: <pre style='line-height: 1;font-family: inherit;background-color:#f7f7f8;padding:1rem'>"+data.response.text+"</pre></p>";
-                        chatContainer.innerHTML += "<p><img src='https://icons8.com/icon/HRqoDlVZAD8t/bot'> <p style='line-height: 1.6;font-family: inherit;background-color:#f7f7f8;overflow-x: hidden;overflow-y: hidden;white-space: pre-wrap;padding:1rem !important;'>"+data.response.text+"</p></p>";
+                        chatContainer.innerHTML += "<p><img src='https://drive.google.com/file/d/13tJ0y_-dgyhSHrF-yD0gxi9fhQNYv6a8/view?usp=drive_link'> <p style='line-height: 1.6;font-family: inherit;background-color:#f7f7f8;overflow-x: hidden;overflow-y: hidden;white-space: pre-wrap;padding:1rem !important;font-size: 14px;'>"+data.response.text+"</p></p>";
 
                         // chatContainer.innerHTML += "<p>AI: <pre style='line-height: 1;font-family: inherit;background-color:#f7f7f8;'></pre></p>";
                         // chatContainer.innerHTML += data.response.text

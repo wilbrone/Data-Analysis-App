@@ -158,10 +158,16 @@ def upload_view(request):
                 destination.write(chunk)
         
 
-        question = ""
-        process_question(question, uploaded_file.name)
+        question = "You are an AI assistant in the field of data science. Learn everything you need to know and all the techniques of cleaning a dataset. Use this knowledge and everything in your capacity to clean the dataset, print out the updated data in a file and save locally in the media folder (settings.MEDIA_ROOT) use PIL. Handle missing values by removing the rows with missing values. Do not exclude or interfere with the columns with date and time in your execution"
+        results = process_question(question, uploaded_file.name)
 
-        print(file_path)
+        print(file_path, '###########################', results.get('response'))
+
+        codebox_folder = os.path.join(settings.BASE_DIR, '.codebox')
+
+        for filename in os.listdir(codebox_folder):
+            print(filename, 'eeeerererererrhëëëëëë')
+
         # If you want to save the file to the database, create a new UploadedFile instance and save it.
         # uploaded_file_instance = UploadedFile(file=uploaded_file)
         # uploaded_file_instance.save()
