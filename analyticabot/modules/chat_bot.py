@@ -9,6 +9,7 @@ from analyticabot.modules.messages import get_chat_history
 
 
 def process_question(question, file):
+    print('------------------------', type(file))
     full_file_path = os.path.join(settings.MEDIA_ROOT, 'user_id/'+file)
     print(question, '------------------------', full_file_path)
     try:
@@ -17,11 +18,16 @@ def process_question(question, file):
         with CodeInterpreterSession(model="gpt-3.5-turbo-16k") as session:
             # Define the user request
             user_request = question
-            files = [
-                # File(full_file_path)
-                File.from_path(full_file_path)
-            ]  # Add files if needed
-            
+            if file:
+                print('--------We have a FILE----------------')
+                files = [
+                    # File(full_file_path)
+                    File.from_path(full_file_path)
+                ]  # Add files if needed
+            else:
+                print('--------We do NOT have a FILE----------------')
+                files = []
+                
             cached_chat_history = get_chat_history()
             chat_history = [
                 {
