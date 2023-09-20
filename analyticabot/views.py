@@ -140,6 +140,8 @@ def get_user_files(request):
 
 
 def upload_view(request):
+    print('ÄÄÄÄÄÄÄÄÄÄÄÄ', request.FILES['file'])
+    
     if request.method == 'POST' and request.FILES['file']:
         uploaded_file = request.FILES['file']
         print(uploaded_file, 'ÄÄÄÄÄÄÄÄÄÄÄÄ', uploaded_file.name)
