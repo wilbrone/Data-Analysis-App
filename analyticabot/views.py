@@ -209,17 +209,37 @@ def upload_view(request):
 def upload_file(request):
     mode = settings.MODE
     file_name = ''
-    print('ÄÄÄÄÄÄÄÄÄÄÄÄ---Checking for file in request.FILES = ', 'file' in request.FILES, 'request.POST----->', request.POST, 'request.FILES', request.FILES)
+    print('ÄÄÄÄÄÄÄÄÄÄÄÄ---Checking for file in request.FILES = ', 'file' in request.FILES, 'request.POST----->', request.POST, 'request.FILES', request.FILES, request.FILES['file'])
 
     # print('ÄÄÄÄÄÄÄÄÄÄÄ---Getting uploaded file', request.FILES['file'])
     try:
         if request.method == 'POST':
-            file_name = request.POST['file']
-            form = FileUploadForm(request.POST, request.FILES)
-            print('ÄÄÄÄÄÄÄÄÄÄÄ---Checking the form ', form)
-            if form.is_valid():
+            file = request.FILES['file']
+            print('ÄÄÄÄÄÄÄÄÄÄÄ---Checking the file', file)
+            if file:
+                file_name = file.name
+                # process the file
+
+                print("process the file")
+
                 handle_uploaded_file(request.FILES['file'])
-                return render(request, 'pages/index.html', {'mode':mode, 'file':file_name})
+
+                form = FileUploadForm()
+                return render(request, 'pages/index.html', {'mode':mode, 'file':file_name, 'form':form})
+                ...
+            else:
+                # handle the case where no file was provided
+                form = FileUploadForm()
+                print("handle the case where no file was provided")
+                ...
+
+            # form = FileUploadForm(request.POST, request.FILES)
+            # print('ÄÄÄÄÄÄÄÄÄÄÄ---Checking the form ', form)
+            # if form.is_valid():
+
+            #     handle_uploaded_file(request.FILES['file'])
+            #     return render(request, 'pages/index.html', {'mode':mode, 'file':file_name})
+            
         else:
             form = FileUploadForm()
 
