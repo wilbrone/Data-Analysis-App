@@ -45,6 +45,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
+    'crispy_forms',
+    "crispy_bootstrap5",
+    "crispy_bootstrap4",
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [
@@ -78,6 +82,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'analysist.wsgi.application'
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+# CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+# CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 CORS_ALLOW_METHODS = [
     'POST',

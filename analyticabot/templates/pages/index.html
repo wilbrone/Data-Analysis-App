@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+{% crispy form %}
+
 {% block content %}
 {{block.super}}
    
@@ -28,7 +32,7 @@
                 <div style="padding-left: 2rem;
                 position: absolute;
                 bottom: 150px;">
-                    <h1>Upload a File</h1>
+                    <!-- <h1>Upload a File</h1> -->
                     <!-- <form>
                         {% csrf_token %}
                         <!-- {{ form.as_p }}
@@ -36,16 +40,24 @@
                     </form> -->
 
                     <form id="file-upload-form" method="post" enctype="multipart/form-data" style="display: grid;">
-                        {% csrf_token %}
+                        <!-- {% csrf_token %}
                         <input type="file" name="file" id="file" accept=".csv, .xlsx">
                         <button type="submit" class="btn btn-outline-secondary" style="width: 50%;
                         margin-top: 1rem;
                         color: white;">
                             Upload
-                        </button>
+                        </button> -->
+                    </form> 
+
+                    <form action="{% url 'upload_view' %}" method="post" enctype="multi-part/form-data">
+                        {% csrf_token%}
+                        {{ form|crispy}}
+                        <button type="submit" class="btn btn-primary btn-sm D-block mx-auto"> Submit</button>
                     </form>
 
                     <h2 style="font-weight: bolder;">Uploaded Files</h2>
+                    <!-- {{myVariableII}} -->
+                    <p> {{ file }}</p>
                     <ul id="files">
                         <!-- {% for file in uploaded_files %} -->
                             <!-- <li> -->
@@ -131,14 +143,15 @@
             var chatContainer = document.getElementById("chat-container");
             var messageForm = document.getElementById("message-form");
             var userInput = document.getElementById("user-input");
-            var filesCollected = document.getElementById("files");
+            // var filesCollected = document.getElementById("files");
             var myVariable = "{{ mode }}";
+            var myVariableII = "{{ file }}";
             var url = ''
             var fileToQuery = ''
 
             var formData = document.getElementById("file-upload-form")
 
-            console.log(myVariable, 'ÄÄÄÄÄÄÄÄ');
+            console.log(myVariable, 'ÄÄÄÄÄÄÄÄ', myVariableII);
             
 
             if(myVariable === 'dev'){

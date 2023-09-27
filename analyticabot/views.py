@@ -20,6 +20,8 @@ from django.shortcuts import render
 from django.views.generic.edit import FormView
 from django.conf import settings
 
+from .form import FileUploadForm
+
 # Create your views here.
 
 global count 
@@ -107,7 +109,25 @@ def send_question(request):
 def index(request):
     data = "Data was found here"
     mode = settings.MODE
-    return render(request, 'pages/index.html', {'mode': mode})
+    # if request.method == 'POST':
+    #     print('request.POST', request.POST)
+    #     form = FileUploadForm(request.POST, request.FILES)
+    #     print('form', form, form.is_valid())
+    #     if form.is_valid():
+    #         print('form.is_valid')
+    #         # 
+    #         handle_uploaded_file(request.FILES['file'])
+    #         return render(request, 'file_uploaded.html')
+    #     else:
+    #         print('else---------')
+    #         # 
+    #         form = FileUploadForm()
+    # else:
+    #     print('else')
+    #     # 
+    form = FileUploadForm()
+    # return render(request, 'pages/index.html', {'form': form})
+    return render(request, 'pages/index.html', {'mode': mode, 'form': form})
 
 
 def send_question_II(request):
@@ -183,3 +203,45 @@ def upload_view(request):
         return JsonResponse({'message': 'File uploaded successfully', 'file_name': uploaded_file.name})
     else:
         return JsonResponse({'message': 'No file provided'}, status=400)
+    
+
+# @api_view(['POST'])
+def upload_file(request):
+    mode = settings.MODE
+    file_name = ''
+    print('ÄÄÄÄÄÄÄÄÄÄÄÄ---Checking for file in request.FILES = ', 'file' in request.FILES, 'request.POST----->', request.POST, 'request.FILES', request.FILES)
+
+    # print('ÄÄÄÄÄÄÄÄÄÄÄ---Getting uploaded file', request.FILES['file'])
+    try:
+        if request.method == 'POST':
+            file_name = request.POST['file']
+            form = FileUploadForm(request.POST, request.FILES)
+            print('ÄÄÄÄÄÄÄÄÄÄÄ---Checking the form ', form)
+            if form.is_valid():
+                handle_uploaded_file(request.FILES['file'])
+                return render(request, 'pages/index.html', {'mode':mode, 'file':file_name})
+        else:
+            form = FileUploadForm()
+
+        return render(request, 'pages/index.html', {'form': form, 'mode':mode, 'file':file_name})
+    except:
+        form = FileUploadForm()
+        return render(request, 'pages/index.html', {'form': form, 'mode':mode, 'file':file_name})
+    
+def handle_uploaded_file(f):
+    # with open(os.path.join('media', f.name), 'wb+') as destination:
+    #     for chunk in f.chunks():
+    #         destination.write(chunk)
+    print('ÄÄÄÄÄÄÄÄÄÄÄÄ', f.name)
+    media_root = settings.MEDIA_ROOT
+    
+    # Create a directory based on the user ID if it doesn't exist
+    user_folder_path = os.path.join(media_root, 'user_id')
+    if not os.path.exists(user_folder_path):
+        os.makedirs(user_folder_path)
+    
+    # Save the uploaded file to the user's folder
+    file_path = os.path.join(user_folder_path, f.name)
+    with open(file_path, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
