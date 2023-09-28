@@ -20,6 +20,8 @@ from django.shortcuts import render
 from django.views.generic.edit import FormView
 from django.conf import settings
 
+from .form import FileUploadForm
+
 # Create your views here.
 
 global count 
@@ -107,7 +109,25 @@ def send_question(request):
 def index(request):
     data = "Data was found here"
     mode = settings.MODE
-    return render(request, 'pages/index.html', {'mode': mode})
+    # if request.method == 'POST':
+    #     print('request.POST', request.POST)
+    #     form = FileUploadForm(request.POST, request.FILES)
+    #     print('form', form, form.is_valid())
+    #     if form.is_valid():
+    #         print('form.is_valid')
+    #         # 
+    #         handle_uploaded_file(request.FILES['file'])
+    #         return render(request, 'file_uploaded.html')
+    #     else:
+    #         print('else---------')
+    #         # 
+    #         form = FileUploadForm()
+    # else:
+    #     print('else')
+    #     # 
+    form = FileUploadForm()
+    # return render(request, 'pages/index.html', {'form': form})
+    return render(request, 'pages/index.html', {'mode': mode, 'form': form})
 
 
 def send_question_II(request):
@@ -140,6 +160,8 @@ def get_user_files(request):
 
 
 def upload_view(request):
+    print('ÄÄÄÄÄÄÄÄÄÄÄÄ', request.FILES)
+
     if request.method == 'POST' and request.FILES['file']:
         uploaded_file = request.FILES['file']
         print(uploaded_file, 'ÄÄÄÄÄÄÄÄÄÄÄÄ', uploaded_file.name)
@@ -158,10 +180,16 @@ def upload_view(request):
                 destination.write(chunk)
         
 
-        question = ""
-        process_question(question, uploaded_file.name)
+        # question = "You are an AI assistant in the field of data science. Learn everything you need to know and all the techniques of cleaning a dataset. Use this knowledge and everything in your capacity to clean the dataset, print out the updated data in a file and save locally in the media folder (settings.MEDIA_ROOT) use PIL. Handle missing values by removing the rows with missing values. Do not exclude or interfere with the columns with date and time in your execution"
+        # results = process_question(question, uploaded_file.name)
 
-        print(file_path)
+        # print(file_path, '###########################', results.get('response'))
+
+        codebox_folder = os.path.join(settings.BASE_DIR, '.codebox')
+
+        for filename in os.listdir(codebox_folder):
+            print(filename, 'eeeerererererrhëëëëëë')
+
         # If you want to save the file to the database, create a new UploadedFile instance and save it.
         # uploaded_file_instance = UploadedFile(file=uploaded_file)
         # uploaded_file_instance.save()
@@ -175,3 +203,65 @@ def upload_view(request):
         return JsonResponse({'message': 'File uploaded successfully', 'file_name': uploaded_file.name})
     else:
         return JsonResponse({'message': 'No file provided'}, status=400)
+    
+
+# @api_view(['POST'])
+def upload_file(request):
+    mode = settings.MODE
+    file_name = ''
+    print('ÄÄÄÄÄÄÄÄÄÄÄÄ---Checking for file in request.FILES = ', 'file' in request.FILES, 'request.POST----->', request.POST, 'request.FILES', request.FILES, request.FILES['file'])
+
+    # print('ÄÄÄÄÄÄÄÄÄÄÄ---Getting uploaded file', request.FILES['file'])
+    try:
+        if request.method == 'POST':
+            file = request.FILES['file']
+            print('ÄÄÄÄÄÄÄÄÄÄÄ---Checking the file', file)
+            if file:
+                file_name = file.name
+                # process the file
+
+                print("process the file")
+
+                handle_uploaded_file(request.FILES['file'])
+
+                form = FileUploadForm()
+                return render(request, 'pages/index.html', {'mode':mode, 'file':file_name, 'form':form})
+                ...
+            else:
+                # handle the case where no file was provided
+                form = FileUploadForm()
+                print("handle the case where no file was provided")
+                ...
+
+            # form = FileUploadForm(request.POST, request.FILES)
+            # print('ÄÄÄÄÄÄÄÄÄÄÄ---Checking the form ', form)
+            # if form.is_valid():
+
+            #     handle_uploaded_file(request.FILES['file'])
+            #     return render(request, 'pages/index.html', {'mode':mode, 'file':file_name})
+            
+        else:
+            form = FileUploadForm()
+
+        return render(request, 'pages/index.html', {'form': form, 'mode':mode, 'file':file_name})
+    except:
+        form = FileUploadForm()
+        return render(request, 'pages/index.html', {'form': form, 'mode':mode, 'file':file_name})
+    
+def handle_uploaded_file(f):
+    # with open(os.path.join('media', f.name), 'wb+') as destination:
+    #     for chunk in f.chunks():
+    #         destination.write(chunk)
+    print('ÄÄÄÄÄÄÄÄÄÄÄÄ', f.name)
+    media_root = settings.MEDIA_ROOT
+    
+    # Create a directory based on the user ID if it doesn't exist
+    user_folder_path = os.path.join(media_root, 'user_id')
+    if not os.path.exists(user_folder_path):
+        os.makedirs(user_folder_path)
+    
+    # Save the uploaded file to the user's folder
+    file_path = os.path.join(user_folder_path, f.name)
+    with open(file_path, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)

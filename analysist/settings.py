@@ -45,6 +45,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
+    'crispy_forms',
+    "crispy_bootstrap5",
+    "crispy_bootstrap4",
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [
@@ -78,6 +82,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'analysist.wsgi.application'
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+# CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+# CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 CORS_ALLOW_METHODS = [
     'POST',
@@ -105,19 +114,28 @@ else:
 # }
 
 # development
-if config('MODE')=="dev":
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': config('DB_NAME'),
-            'USER': config('DB_USER'),
-            'PASSWORD': config('DB_PASSWORD'),
-            'HOST': config('DB_HOST'),
-            'PORT': '5432',
-        }
+# if config('MODE')=="dev":
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': '5432',
     }
-else:
-    pass
+}
+# else:
+#     DATABASES = {
+#         'default': dj_database_url.config(
+#             default=config('DATABASE_URL')
+#         )
+#     }
+
+#     db_from_env = dj_database_url.config(conn_max_age=500)
+#     DATABASES['default'].update(db_from_env)
+
+    # ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 
 os.environ["OPENAI_API_KEY"] = config("OPENAI_API_KEY")

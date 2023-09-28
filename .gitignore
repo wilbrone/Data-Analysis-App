@@ -3,7 +3,7 @@
 .autogit
 my_env
 __pycache__
-media
-media/*
+staticfiles/*
+media/user_id/*
 *.pdf
 .codebox/
