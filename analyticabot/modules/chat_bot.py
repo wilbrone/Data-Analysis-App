@@ -1,8 +1,9 @@
-
-
 import os
 import re
 from codeinterpreterapi import CodeInterpreterSession, File
+from langchain.memory import ConversationSummaryBufferMemory
+from langchain import OpenAI
+
 from django.conf import settings
 
 from analyticabot.modules.messages import get_chat_history
@@ -12,12 +13,13 @@ def process_question(question, file):
     print('------------------------', type(file))
     full_file_path = os.path.join(settings.MEDIA_ROOT, 'user_id/'+file)
     print(question, '------------------------', full_file_path)
+    
     try:
         # result = None
         # Create a session and reuse it for multiple requests if needed
         with CodeInterpreterSession(model="gpt-3.5-turbo-16k") as session:
             # Define the user request
-            user_request = question
+            
             if file:
                 print('--------We have a FILE----------------')
                 files = [
@@ -28,28 +30,31 @@ def process_question(question, file):
                 print('--------We do NOT have a FILE----------------')
                 files = []
                 
-            cached_chat_history = get_chat_history()
-            chat_history = [
-                {
-                    'role': 'AI',
-                    'content': chat['content']['response']
-                } if chat['role'] == 'AI' else chat
-                for chat in cached_chat_history
-            ]
+            cached_chat_history = get_chat_history(question)
+            print('--------CACHED CHAT HISTORY----------------', cached_chat_history)
+
+            chat_history = cached_chat_history['conversation_memory'].load_memory_variables({})
 
             # chat_history = chat.get('chat_history')
             # Extend the chat history with the user's request
-            chat_history.append({
+            user_request = {
                 'role': 'user',
-                'content': f"""{user_request}
-                NOTE: Be Professional, Precise, and Informative. Perform thorough and thoughtful analyses to assist with decision-making. Handle missing values and clean the dataset when possible. Avoid including any code in your final response to me.
+                'content': f"""{question}
+                """
+            }
+
+            # sent_q = f"""{user_request}\n NOTE: Do not return any code in your response. If there is an error in the dataset please clean it and continue. If it is impossible let me know about it and give me suggestions on how you can help solve the error. Always predict what I want next and act on it"""
+            my_string = f"""Chat History:{chat_history} 
+                
+                \n{user_request}
+               
+               \n\n NOTE: Be Professional, Precise, and Informative. Perform thorough and thoughtful analyses to assist with decision-making. Handle missing values and clean the dataset when possible. Avoid including any code in your final response to me.
                 In case of errors in the dataset, please clean it and continue. If it's impossible, inform me and provide suggestions on resolving the issue.
                 Always anticipate my needs and act accordingly. If the there is code to interprete pleaese do so, to assist me with my analysis
                 If you encounter an openai.error.InvalidRequestError, find a smart way to truncate messages by keeping the latest messages to reduce the message's token count.
-                """
-            })
-            # sent_q = f"""{user_request}\n NOTE: Do not return any code in your response. If there is an error in the dataset please clean it and continue. If it is impossible let me know about it and give me suggestions on how you can help solve the error. Always predict what I want next and act on it"""
-            my_string = f"""{chat_history}"""
+                Do not report all this in your response. Just return a precise answer.
+            """
+            
             print(my_string, '-----<---<--<-<-<-')
             
             # Generate the response

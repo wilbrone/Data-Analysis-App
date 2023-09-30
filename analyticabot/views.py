@@ -94,7 +94,7 @@ def send_question(request):
                 "sessionId": session_id,
             }
 
-            save_chat_history(question, results)
+            save_chat_history(question, results.get('response'))
             
             # return Response(response, status=status.HTTP_200_OK)
             return JsonResponse({'response': response})
@@ -165,9 +165,9 @@ def upload_view(request):
     if request.method == 'POST' and request.FILES['file']:
         uploaded_file = request.FILES['file']
         print(uploaded_file, 'ÄÄÄÄÄÄÄÄÄÄÄÄ', uploaded_file.name)
-
+        
         media_root = settings.MEDIA_ROOT
-    
+
         # Create a directory based on the user ID if it doesn't exist
         user_folder_path = os.path.join(media_root, 'user_id')
         if not os.path.exists(user_folder_path):
@@ -221,9 +221,13 @@ def upload_file(request):
                 # process the file
 
                 print("process the file")
-
-                handle_uploaded_file(request.FILES['file'])
-
+                file_format = get_file_format(file_name)
+                if file_format == '.csv' or file_format in ('.xls', '.xlsx', '.xlsb', '.xlsm'):
+                    handle_uploaded_file(request.FILES['file'])
+                else:
+                    print('#######---- The file is in Excel format.')
+                    form = FileUploadForm()
+                    return render(request, 'pages/index.html', {'message':'please attach a file', 'form':form})
                 form = FileUploadForm()
                 return render(request, 'pages/index.html', {'mode':mode, 'file':file_name, 'form':form})
                 ...
@@ -265,3 +269,7 @@ def handle_uploaded_file(f):
     with open(file_path, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+
+def get_file_format(filename):
+    _, file_extension = os.path.splitext(filename)
+    return file_extension.lower()
