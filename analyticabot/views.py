@@ -15,7 +15,7 @@ from analyticabot.modules.messages import save_chat_history
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from analyticabot.modules.utils import list_media_files
+from analyticabot.modules.utils import delete_media_file, list_media_files
 from django.shortcuts import render
 from django.views.generic.edit import FormView
 from django.conf import settings
@@ -218,7 +218,9 @@ def upload_file(request):
             print('ÄÄÄÄÄÄÄÄÄÄÄ---Checking the file', file)
             if file:
                 file_name = file.name
+                
                 # process the file
+                delete_media_file()
 
                 print("process the file")
                 file_format = get_file_format(file_name)

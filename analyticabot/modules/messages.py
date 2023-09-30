@@ -20,7 +20,8 @@ def save_chat_history(user_input, ai_response):
 
     cached_chat_history.append({'human': user_input, 'AI': ai_response if ai_response is not None else '' })
     # cached_chat_history.append({'role': 'AI', 'content': ai_response})
-    print(cached_chat_history, 'cached_chat_history-----------yyyyy')
+
+    # print(cached_chat_history, 'cached_chat_history-----------yyyyy')
     cache.set('chat_history', cached_chat_history, cache_timeout)
     
     return
@@ -41,7 +42,7 @@ def get_chat_history(question):
 
         for message in user_messages:
 
-            print(message, '*******')                                                                                                
+            # print(message, '*******')                                                                                             
             conversation_memory.save_context({"input": message['human']}, {"output": message['AI']})                                    
 
     return {"conversation_memory": conversation_memory}
