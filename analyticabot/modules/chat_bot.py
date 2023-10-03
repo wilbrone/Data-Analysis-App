@@ -48,11 +48,11 @@ def process_question(question, file):
                 
                 \n{user_request}
                
-               \n\n NOTE: Be Professional, Precise, and Informative. Perform thorough and thoughtful analyses to assist with decision-making. Handle missing values and clean the dataset when possible. Avoid including any code in your final response to me.
-                In case of errors in the dataset, please clean it and continue. If it's impossible, inform me and provide suggestions on resolving the issue.
+               \n\n NOTE: Be Professional, Precise, and Informative. Perform thorough and thoughtful analyses to assist with decision-making. Handle missing values and clean the dataset. Avoid including any code in your final response to me.
+                In case of errors in the dataset, please clean it, resovle and continue. If it's impossible, inform me and provide suggestions on resolving the issue.
                 Always anticipate my needs and act accordingly. If the there is code to interprete pleaese do so, to assist me with my analysis
                 If you encounter an openai.error.InvalidRequestError, find a smart way to truncate messages by keeping the latest messages to reduce the message's token count.
-                Do not report all this in your response. Just return a precise answer.
+                Do not report all this in your response. Just return a precise answer. if there is a dataset refer to it
             """
             
             print(my_string, '-----<---<--<-<-<-')
@@ -74,8 +74,8 @@ def process_question(question, file):
                 print('------------------------_>>>>>>>>>>>>>>>>>>>>>>>__<<<<<>>', response.code_log[0], len(response.code_log), len(response.files))
                 # result['file_names'] = [file.name for file in response.files]
                 result['file'] = [file[1] for file in response.code_log]
-                for file in response.files:
-                    file.show_image()
+                # for file in response.files:
+                #     file.show_image()
 
             return result
 
